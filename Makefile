@@ -4,9 +4,9 @@ CXXFLAGS = -Wall -std=c++17 -g -I./include
 LDFLAGS = 
 OBJDIR = obj
 BINDIR = bin
-SOURCES = src/k_ary_heap.cpp src/dijkstra.cpp
+SOURCES = src/k_ary_heap.cpp src/dijkstra.cpp src/graph.cpp src/main.cpp
 OBJECTS = $(SOURCES:src/%.cpp=obj/%.o)
-TARGET = $(BINDIR)/dijkstra_program
+TARGET = $(BINDIR)/dijkstra
 
 # Diretórios
 $(shell mkdir -p $(OBJDIR) $(BINDIR))
