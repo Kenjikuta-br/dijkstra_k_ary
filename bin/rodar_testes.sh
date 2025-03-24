@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#chmod +x rodar_testes.sh
+#chmod +x bin/rodar_testes.sh
 
 # Diretório onde seu código está localizado (ajuste conforme necessário)
 PROGRAM="./bin/dijkstra"  # Substitua pelo nome do seu programa executável
