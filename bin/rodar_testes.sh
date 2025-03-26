@@ -1,39 +1,30 @@
 #!/bin/bash
 
-#chmod +x bin/rodar_testes.sh
-
-# Diretório onde seu código está localizado (ajuste conforme necessário)
-PROGRAM="./bin/dijkstra"  # Substitua pelo nome do seu programa executável
-
-# Lista de arquivos de entrada (grafos em arquivos .txt)
-INPUT_FILES=("testes/grafo_teste1.txt" "testes/grafo_teste2.txt")  # Adicione os arquivos de grafos que você deseja testar
-
-# Valores de k para testar 
-K_VALUES=$(seq 2 1 10)
-
-# Origem e Destino para o algoritmo Dijkstra (ajuste conforme necessário)
-SOURCE=1  # Origem (1-based)
-DESTINATION=5  # Destino (1-based)
-
-# Criar um diretório para armazenar os resultados
-RESULTS_DIR="resultados"
+PROGRAM="./bin/dijkstra"  # Substitua pelo caminho do seu executável
+GRAPH_DIR="graphs"  # Diretório onde os grafos estão armazenados
+RESULTS_DIR="resultados"  # Diretório para salvar os resultados
 mkdir -p "$RESULTS_DIR"
 
-# Loop sobre os arquivos de entrada e os valores de k
-for FILE in "${INPUT_FILES[@]}"; do
-    for K in $K_VALUES; do
-        # Executar o programa com o grafo atual e o valor de k
-        echo "Executando Dijkstra com k=$K no arquivo $FILE"
+K_VALUES=$(seq 2 1 10)  # Valores de k
+
+# Itera sobre as pastas de densidade
+for DENSITY_FOLDER in "$GRAPH_DIR"/density_*; do
+    DENSITY=$(basename "$DENSITY_FOLDER" | cut -d'_' -f2)  # Extrai o valor de p
+    CSV_FILE="$RESULTS_DIR/resultados_density_${DENSITY}.csv"
+    echo "p;vertices;k;insert_count;extractMin_count;decreaseKey_count;avg_r;execution_time" > "$CSV_FILE"  # Cabeçalho do CSV
+    
+    # Itera sobre os arquivos de grafo na pasta
+    for GRAPH_FILE in "$DENSITY_FOLDER"/graph_*.gr; do
+        VERTICES=$(basename "$GRAPH_FILE" | cut -d'_' -f2 | cut -d'.' -f1)  # Extrai o número de vértices
         
-        # Nome do arquivo de saída para os resultados
-        OUTPUT_FILE="$RESULTS_DIR/resultado_$(basename "$FILE" .txt)_k${K}.txt"
-        
-        # Chamar o programa, passando os parâmetros (origem, destino, k)
-        # O arquivo de entrada será redirecionado para o programa Dijkstra
-        $PROGRAM "-kenji" "$SOURCE" "$DESTINATION" "$K" < "$FILE" > "$OUTPUT_FILE"
-        
-        echo "Resultado salvo em $OUTPUT_FILE"
+        for K in $K_VALUES; do
+            echo "Executando Dijkstra para p=$DENSITY, V=$VERTICES, k=$K"
+            OUTPUT=$($PROGRAM "-kenji" "1" "5" "$K" < "$GRAPH_FILE")
+            echo "$DENSITY;$VERTICES;$K;$OUTPUT" >> "$CSV_FILE"
+        done
     done
+
 done
 
-echo "Execução concluída."
+echo "Execução concluída. Resultados salvos em $RESULTS_DIR"
+
