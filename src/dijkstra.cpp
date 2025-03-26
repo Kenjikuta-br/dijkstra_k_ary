@@ -2,13 +2,22 @@
 #include <iostream>
 #include <fstream>
 #include <cstdlib>
+#include <chrono>
+#include <omp.h>
 //Armazena a referência do grafo.
 //Cria um vetor para armazenar as menores distâncias, inicialmente definidas como infinito.
 Dijkstra::Dijkstra(const Graph& graph) : graph(graph) {
     distances.resize(graph.adj.size(), std::numeric_limits<int>::max());
 }
 
-void Dijkstra::computeShortestPaths(int source, int k) {
+void Dijkstra::computeShortestPaths(int source, int k, bool kenjiFlag) {
+
+    // Garantindo que está utilizando apenas uma thread
+    // omp_set_num_threads(1); 
+
+    // Medição do tempo
+    auto start_time = std::chrono::system_clock::now();
+
     int n = graph.adj.size();
     distances.assign(n, std::numeric_limits<int>::max());  // Resetar distâncias
     distances[source] = 0;
@@ -44,6 +53,24 @@ void Dijkstra::computeShortestPaths(int source, int k) {
                 }
             }
         }
+    }
+
+    // Medição do tempo após a execução
+    auto end_time = std::chrono::system_clock::now();
+    std::chrono::milliseconds duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
+    
+    if(kenjiFlag){
+        std::cout << heap.getInsertCount() << ";"
+          << heap.getExtractMinCount() << ";"
+          << heap.getDecreaseKeyCount() << ";"
+          << heap.calculateAverageR() << ";"
+          << duration.count()<< ";";
+    }else{
+        std::cout << "Número de inserts: " << heap.getInsertCount() << std::endl;
+        std::cout << "Número de extractMin: " << heap.getExtractMinCount() << std::endl;
+        std::cout << "Número de decreaseKey: " << heap.getDecreaseKeyCount() << std::endl;
+        std::cout << "Média de r: " << heap.calculateAverageR() << std::endl;
+        std::cout << "Tempo de execução: " << duration.count() << " ms" << std::endl;
     }
 }
 

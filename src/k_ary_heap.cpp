@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <stdexcept>
 #include <iostream>
+#include <cmath>
 
 // Construtor: Inicializa a heap e define o tamanho do indexMap
 KaryHeap::KaryHeap(int k, int numVertices) : k(k), indexMap(numVertices, -1) {}
@@ -26,6 +27,17 @@ void KaryHeap::insert(const HeapNode& node) {
 
     // Reorganiza a heap para manter a propriedade
     heapifyUp(pos);
+
+    // Incrementa o contador de inserts
+    insertCount++;
+
+    // Calcula r para a operação de insert
+    double log_k_n = std::log(heap.size()) / std::log(k);
+    double r = (log_k_n == 0) ? 0 : static_cast<double>(siftDownCount) / log_k_n;
+    rValues.push_back(r);
+
+    // Zera o contador de sift-ups após calcular r
+    siftUpCount = 0;
 }
 
 HeapNode KaryHeap::extractMin() {
@@ -49,6 +61,17 @@ HeapNode KaryHeap::extractMin() {
         heapifyDown(0);
     }
 
+    // Incrementa o contador de extractMin
+    extractMinCount++;
+
+    // Calcula r para a operação de extractMin
+    double log_k_n = std::log(heap.size()) / std::log(k);
+    double r = (log_k_n == 0) ? 0 : static_cast<double>(siftDownCount) / log_k_n;
+    rValues.push_back(r);
+
+    // Zera o contador de sift-ups após calcular r
+    siftDownCount = 0;
+
     return minNode;
 }
 
@@ -71,6 +94,17 @@ void KaryHeap::decreaseKey(int node_id, int new_priority) {
 
     // Reorganiza a heap
     heapifyUp(idx);
+
+    // Incrementa o contador de decreaseKey
+    decreaseKeyCount++;
+
+    // Calcula r para a operação de decreaseKey
+    double log_k_n = std::log(heap.size()) / std::log(k);
+    double r = (log_k_n == 0) ? 0 : static_cast<double>(siftDownCount) / log_k_n;
+    rValues.push_back(r);
+
+    // Zera o contador de sift-ups após calcular r
+    siftUpCount = 0;
 }
 
 const HeapNode& KaryHeap::getMin() const {
@@ -89,6 +123,9 @@ void KaryHeap::heapifyUp(int idx) {
         // Atualiza os índices no indexMap
         indexMap[heap[idx].node_id] = idx;
         indexMap[heap[parentIdx].node_id] = parentIdx;
+
+        // Incrementa o contador de sift-up
+        siftUpCount++;
 
         heapifyUp(parentIdx);
     }
@@ -113,6 +150,9 @@ void KaryHeap::heapifyDown(int idx) {
         indexMap[heap[idx].node_id] = idx;
         indexMap[heap[minIdx].node_id] = minIdx;
 
+        // Incrementa o contador de sift-down
+        siftDownCount++;
+
         heapifyDown(minIdx);
     }
 }
@@ -129,38 +169,15 @@ int KaryHeap::getPriority(int v) const {
     return heap[idx].priority;
 }
 
+long double KaryHeap::calculateAverageR() const {
+    if (rValues.empty()) {
+        return 0.0L;  // Se o vetor estiver vazio, retornamos 0
+    }
 
-/*
-int main() {
-    // Vamos criar um heap ternário (k=3) com 5 nós
-    KaryHeap heap(3, 5); // k = 3, numVertices = 5
+    long double sum = 0.0L;
+    for (long double r : rValues) {
+        sum += r;  // Somamos todos os valores de r
+    }
 
-    // Vamos inserir alguns nós com diferentes prioridades
-    heap.insert(HeapNode(0, 10)); // Nó 0 com prioridade 10
-    heap.insert(HeapNode(1, 20)); // Nó 1 com prioridade 20
-    heap.insert(HeapNode(2, 5));  // Nó 2 com prioridade 5
-    heap.insert(HeapNode(3, 30)); // Nó 3 com prioridade 30
-    heap.insert(HeapNode(4, 15)); // Nó 4 com prioridade 15
-
-    // O nó de menor prioridade deve ser o nó 2, com prioridade 5
-    std::cout << "Min node before extraction: " << heap.getMin().node_id << " with priority " << heap.getMin().priority << std::endl;
-
-    // Vamos extrair o nó de menor prioridade
-    HeapNode minNode = heap.extractMin();
-    std::cout << "Extracted min node: " << minNode.node_id << " with priority " << minNode.priority << std::endl;
-
-    // Agora, o nó com menor prioridade será o nó 0, com prioridade 10
-    std::cout << "Min node after extraction: " << heap.getMin().node_id << " with priority " << heap.getMin().priority << std::endl;
-
-    // Vamos diminuir a chave do nó 4, de 15 para 3
-    heap.decreaseKey(4, 3);
-    std::cout << "Min node after decreasing key: " << heap.getMin().node_id << " with priority " << heap.getMin().priority << std::endl;
-
-    // Extrair o novo nó de menor prioridade
-    minNode = heap.extractMin();
-    std::cout << "Extracted min node after decreasing key: " << minNode.node_id << " with priority " << minNode.priority << std::endl;
-
-    return 0;
+    return sum / rValues.size();  // Calculamos a média dividindo pela quantidade de elementos
 }
-
-*/

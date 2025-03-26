@@ -12,7 +12,7 @@ public:
     Dijkstra(const Graph& graph);
 
     // Calcula os caminhos mínimos a partir do nó de origem
-    void computeShortestPaths(int source,  int k);
+    void computeShortestPaths(int source,  int k, bool kenjiFlag);
 
     // Retorna a distância mínima até um nó específico
     int getDistance(int node) const;

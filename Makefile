@@ -21,7 +21,7 @@ obj/%.o: src/%.cpp
 
 # Limpeza de arquivos temporários
 clean:
-	rm -rf $(OBJDIR)/*.o $(BINDIR)/$(TARGET)
+	rm -rf $(OBJDIR)/*.o $(TARGET)
 
 # Regra para rodar o programa
 run: $(TARGET)

@@ -11,6 +11,7 @@ private:
     std::vector<int> indexMap;   // Mapeia os índices dos nós no heap
 
     // Funções auxiliares para reorganizar o heap
+
     void heapifyUp(int idx);
     void heapifyDown(int idx);
 
@@ -38,6 +39,30 @@ public:
 
     // Retorna a prioridade do vértice v
     int getPriority(int v) const;
+
+    // Calcula a média dos r
+    long double calculateAverageR() const;
+
+    int getInsertCount() const { return insertCount; }
+    int getExtractMinCount() const { return extractMinCount; }
+    int getDecreaseKeyCount() const { return decreaseKeyCount; }
+
+    //__________________________________________________________________________
+    
+    //          VARIÁVEIS
+    //__________________________________________________________________________
+
+    // Variáveis para contar os swaps
+    int siftUpCount = 0;   // Contador para o número de swaps no heapifyUp
+    int siftDownCount = 0; // Contador para o número de swaps no heapifyDown
+
+    // Contadores para as operações
+    int insertCount = 0;  // Contador de inserts
+    int decreaseKeyCount = 0; // Contador de decreaseKey
+    int extractMinCount = 0; // Contador de extractMin
+
+    // Vetor para armazenar r (sift/ log_k n)
+    std::vector<double> rValues;
 };
 
 #endif // K_ARY_HEAP_HPP

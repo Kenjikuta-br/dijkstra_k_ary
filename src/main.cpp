@@ -3,35 +3,59 @@
 #include <fstream>
 #include <cstdlib>
 #include <chrono>
+#include <limits>
+
+const int IDEAL_K = 4;
 
 int main(int argc, char* argv[]) {
-    // Ensure correct number of arguments
-    if (argc != 4) {
-        std::cerr << "Usage: ./dijkstra <source> <destination>  <k>   <   <graph_file>" << std::endl;
+    // Verifica se o programa recebeu o parâmetro correto
+    bool kenjiFlag = false;
+    int source, destination, k;
+
+    // Verifica argumentos e trata o caso do -kenji
+    if (argc == 1) {
+        std::cerr << "Usage: ./dijkstra <source> <destination> <k>(optional) [<] <graph_file>" << std::endl << "Colocar < para graph_file virar o stdin" << std::endl
+                                                << "se colcoar -kenji no primeiro parâmetro, irá devolver outras informações, usadas para a coleta de dados" << std::endl;
+        return 1;
+    }
+
+    // Se o argumento -kenji for encontrado, marca a flag
+    if (std::string(argv[1]) == "-kenji") {
+        //std::cout << "kenji" << std::endl;
+        kenjiFlag = true;
+        argc--; // Reduz o número de argumentos
+        argv++; // Desloca os argumentos
+    }
+
+    // Assegura que os parâmetros restantes estão corretos
+    if (argc != 3 && argc != 4) {
+        std::cerr << "Usage: ./dijkstra <source> <destination> <k>(optional) [<] <graph_file>" << std::endl << "Colocar < para graph_file virar o stdin" << std::endl;
         return 1;
     }
 
     // Parse command-line arguments
-    int source = std::atoi(argv[1]) - 1; // Convert to 0-based index
-    int destination = std::atoi(argv[2]) - 1; // Convert to 0-based index
-    int k = std::atoi(argv[3]);
+    source = std::atoi(argv[1]) - 1; // Converte para índice 0-based
+    destination = std::atoi(argv[2]) - 1; // Converte para índice 0-based
+    k = (argc == 4) ? std::atoi(argv[3]) : IDEAL_K; // Usa IDEAL_K se k não for passado
 
-    // Read graph from standard input
+    
+    // Lê o grafo diretamente do stdin
     Graph graph;
     graph.read_dimacs(std::cin);
 
-    // Create a Dijkstra instance and compute the shortest paths from the given source
+    // Cria uma instância de Dijkstra e calcula os caminhos mais curtos a partir da origem fornecida
     Dijkstra dijkstra(graph);
-    dijkstra.computeShortestPaths(source, k); // Assuming k=4 for the heap structure
+    dijkstra.computeShortestPaths(source, k, kenjiFlag); // Supondo que k=4 para a estrutura da heap
 
-    // Get the shortest distance
+    // Obtém a distância mais curta
     int distance = dijkstra.getDistance(destination);
 
-    // Print the shortest distance from source to destination, if it doesn't exist print inf
+    // Imprime a distância mais curta, se não existir imprime 'inf'
     if (distance == std::numeric_limits<int>::max()) {
         std::cout << "inf" << std::endl;
-    } else {
-        std::cout << "Distância de " << (source + 1) << " até " << (destination + 1) << ": " << distance << std::endl;
+
+    } else if (!kenjiFlag){ //
+      std::cout << distance << std::endl;
     }
 
     return 0;

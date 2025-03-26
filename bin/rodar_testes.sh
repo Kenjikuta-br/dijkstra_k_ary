@@ -30,7 +30,7 @@ for FILE in "${INPUT_FILES[@]}"; do
         
         # Chamar o programa, passando os parâmetros (origem, destino, k)
         # O arquivo de entrada será redirecionado para o programa Dijkstra
-        $PROGRAM "$SOURCE" "$DESTINATION" "$K" < "$FILE" > "$OUTPUT_FILE"
+        $PROGRAM "-kenji" "$SOURCE" "$DESTINATION" "$K" < "$FILE" > "$OUTPUT_FILE"
         
         echo "Resultado salvo em $OUTPUT_FILE"
     done
