@@ -51,7 +51,7 @@ int main(int argc, char* argv[]) {
     int distance = dijkstra.getDistance(destination);
 
     // Imprime a distância mais curta, se não existir imprime 'inf'
-    if (distance == std::numeric_limits<int>::max()) {
+    if ((distance == std::numeric_limits<int>::max()) && (!kenjiFlag)) {
         std::cout << "inf" << std::endl;
 
     } else if (!kenjiFlag){ //

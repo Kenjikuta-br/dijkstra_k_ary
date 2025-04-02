@@ -15,8 +15,8 @@ void Dijkstra::computeShortestPaths(int source, int k, bool kenjiFlag) {
     // Garantindo que está utilizando apenas uma thread
     // omp_set_num_threads(1); 
 
-    // Medição do tempo
-    auto start_time = std::chrono::system_clock::now();
+    // Use nanoseconds ou microseconds em vez de milliseconds
+    auto start_time = std::chrono::high_resolution_clock::now();
 
     int n = graph.adj.size();
     distances.assign(n, std::numeric_limits<int>::max());  // Resetar distâncias
@@ -55,9 +55,9 @@ void Dijkstra::computeShortestPaths(int source, int k, bool kenjiFlag) {
         }
     }
 
-    // Medição do tempo após a execução
-    auto end_time = std::chrono::system_clock::now();
-    std::chrono::milliseconds duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
+    // Medição do tempo
+    auto end_time = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time);
     
     if(kenjiFlag){
         std::cout << heap.getInsertCount() << ";"
