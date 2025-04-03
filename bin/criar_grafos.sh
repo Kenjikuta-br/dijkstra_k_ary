@@ -28,7 +28,7 @@ for density in "${densities[@]}"; do
     echo "Gerando grafos com densidade $density..."
 
     # Gerar grafos para cada número de vértices
-    for ((i=8; i<=15; i++)); do
+    for ((i=7; i<=14; i++)); do
         n=$((2**i))
         output_file="$OUTPUT_DIR/graph_${n}.gr"
         echo "Gerando grafo com $n vértices e densidade $density..."

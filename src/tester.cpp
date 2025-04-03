@@ -11,7 +11,7 @@
 class DijkstraTester {
 public:
     void runTests(const Graph& graph, int k, int num_runs) {
-        std::vector<long long> counts(4, 0); // insert, extract, decrease, time
+        std::vector<long long> counts(5, 0); // edge, insert, extract, decrease, time
         double r_total = 0.0;
         int valid_runs = 0;
         
@@ -51,7 +51,7 @@ public:
                 }
             }
             
-            if (values.size() != 5) {
+            if (values.size() != 6) {
                 continue;
             }
             
@@ -63,8 +63,9 @@ public:
             counts[0] += static_cast<long long>(values[0]);
             counts[1] += static_cast<long long>(values[1]);
             counts[2] += static_cast<long long>(values[2]);
-            r_total += values[3];
-            counts[3] += static_cast<long long>(values[4]);
+            counts[3] += static_cast<long long>(values[3]);
+            r_total += values[4];
+            counts[4] += static_cast<long long>(values[5]);
             
             valid_runs++;
         }
@@ -73,13 +74,14 @@ public:
         
         if (valid_runs > 0) {
             std::cout << std::fixed 
-                << std::setprecision(2) << (static_cast<double>(counts[0]) / valid_runs) << ";"
+                << std::setprecision(2) << static_cast<double>((counts[0] / valid_runs)) << ";"
                 << std::setprecision(2) << (static_cast<double>(counts[1]) / valid_runs) << ";"
                 << std::setprecision(2) << (static_cast<double>(counts[2]) / valid_runs) << ";"
+                << std::setprecision(2) << (static_cast<double>(counts[3]) / valid_runs) << ";"
                 << std::setprecision(6) << (r_total / valid_runs) << ";"
-                << std::setprecision(2) << (static_cast<double>(counts[3]) / valid_runs) << ";\n";
+                << std::setprecision(2) << (static_cast<double>(counts[4]) / valid_runs) << ";\n";
         } else {
-            std::cout << "0;0;0;0;0;\n";
+            std::cout << "0;0;0;0;0;0;\n";
         }
     }
 };

@@ -13,7 +13,7 @@ for DENSITY_FOLDER in "$GRAPH_DIR"/density_*; do
     CSV_FILE="$RESULTS_DIR/resultados_density_${DENSITY}.csv"
     
     # Cabeçalho do CSV atualizado
-    echo "p;vertices;k;avg_insert;avg_extract;avg_decrease;avg_r;avg_time(microseconds);" > "$CSV_FILE"
+    echo "p;k;vertices;edges;avg_insert;avg_extract;avg_decrease;avg_r;avg_time(microseconds);" > "$CSV_FILE"
     
     # Processamento dos arquivos (mantido igual)
     GRAPH_FILES=()
@@ -39,7 +39,7 @@ for DENSITY_FOLDER in "$GRAPH_DIR"/density_*; do
             
             # Chama o novo programa tester que já faz as 30 execuções
             OUTPUT=$($PROGRAM "$K" "$NUM_RUNS" < "$GRAPH_FILE" )
-            echo "$DENSITY;$VERTICES;$K;$OUTPUT" >> "$CSV_FILE"
+            echo "$DENSITY;$K;$VERTICES;$OUTPUT" >> "$CSV_FILE"
         done
     done
 done

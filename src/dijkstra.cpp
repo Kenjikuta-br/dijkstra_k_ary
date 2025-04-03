@@ -60,12 +60,14 @@ void Dijkstra::computeShortestPaths(int source, int k, bool kenjiFlag) {
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time);
     
     if(kenjiFlag){
-        std::cout << heap.getInsertCount() << ";"
+        std::cout << graph.getNumEdges() << ";"
+          << heap.getInsertCount() << ";"
           << heap.getExtractMinCount() << ";"
           << heap.getDecreaseKeyCount() << ";"
           << heap.calculateAverageR() << ";"
           << duration.count()<< ";";
     }else{
+        std::cout << "Número de arestas: " << graph.getNumEdges() << std::endl;
         std::cout << "Número de inserts: " << heap.getInsertCount() << std::endl;
         std::cout << "Número de extractMin: " << heap.getExtractMinCount() << std::endl;
         std::cout << "Número de decreaseKey: " << heap.getDecreaseKeyCount() << std::endl;
