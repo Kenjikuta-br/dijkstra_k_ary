@@ -33,8 +33,8 @@ void KaryHeap::insert(const HeapNode& node) {
 
     // Calcula r para a operação de insert
     double log_k_n = std::log(heap.size()) / std::log(k);
-    double r = (log_k_n == 0) ? 0 : static_cast<double>(siftDownCount) / log_k_n;
-    rValues.push_back(r);
+    double r = (log_k_n == 0) ? 0 : static_cast<double>(siftUpCount) / log_k_n;
+    insertRValues.push_back(r);
 
     // Zera o contador de sift-ups após calcular r
     siftUpCount = 0;
@@ -65,11 +65,11 @@ HeapNode KaryHeap::extractMin() {
     extractMinCount++;
 
     // Calcula r para a operação de extractMin
-    double log_k_n = std::log(heap.size()) / std::log(k);
+    double log_k_n = std::log(heap.size() + 1) / std::log(k); // +1 because we just removed an element
     double r = (log_k_n == 0) ? 0 : static_cast<double>(siftDownCount) / log_k_n;
-    rValues.push_back(r);
+    extractMinRValues.push_back(r);
 
-    // Zera o contador de sift-ups após calcular r
+    // Zera o contador de sift-downs após calcular r
     siftDownCount = 0;
 
     return minNode;
@@ -78,10 +78,7 @@ HeapNode KaryHeap::extractMin() {
 void KaryHeap::decreaseKey(int node_id, int new_priority) {
     int idx = indexMap[node_id];
 
-    //std::cout << "node_id: " << node_id << " com prioridade " << new_priority << std::endl;
-
     if (idx == -1) {
-        std::cout << "FUDEUUUU   node_id: " << node_id << " com prioridade " << new_priority << std::endl;
         throw std::invalid_argument("Node not found in heap.");
     }
 
@@ -100,8 +97,8 @@ void KaryHeap::decreaseKey(int node_id, int new_priority) {
 
     // Calcula r para a operação de decreaseKey
     double log_k_n = std::log(heap.size()) / std::log(k);
-    double r = (log_k_n == 0) ? 0 : static_cast<double>(siftDownCount) / log_k_n;
-    rValues.push_back(r);
+    double r = (log_k_n == 0) ? 0 : static_cast<double>(siftUpCount) / log_k_n;
+    decreaseKeyRValues.push_back(r);
 
     // Zera o contador de sift-ups após calcular r
     siftUpCount = 0;
@@ -169,15 +166,35 @@ int KaryHeap::getPriority(int v) const {
     return heap[idx].priority;
 }
 
-long double KaryHeap::calculateAverageR() const {
-    if (rValues.empty()) {
-        return 0.0L;  // Se o vetor estiver vazio, retornamos 0
+long double KaryHeap::calculateAverageInsertR() const {
+    if (insertRValues.empty()) {
+        return 0.0L;
     }
-
     long double sum = 0.0L;
-    for (long double r : rValues) {
-        sum += r;  // Somamos todos os valores de r
+    for (long double r : insertRValues) {
+        sum += r;
     }
+    return sum / insertRValues.size();
+}
 
-    return sum / rValues.size();  // Calculamos a média dividindo pela quantidade de elementos
+long double KaryHeap::calculateAverageExtractMinR() const {
+    if (extractMinRValues.empty()) {
+        return 0.0L;
+    }
+    long double sum = 0.0L;
+    for (long double r : extractMinRValues) {
+        sum += r;
+    }
+    return sum / extractMinRValues.size();
+}
+
+long double KaryHeap::calculateAverageDecreaseKeyR() const {
+    if (decreaseKeyRValues.empty()) {
+        return 0.0L;
+    }
+    long double sum = 0.0L;
+    for (long double r : decreaseKeyRValues) {
+        sum += r;
+    }
+    return sum / decreaseKeyRValues.size();
 }
