@@ -22,9 +22,9 @@ void Graph::read_dimacs(std::istream& in) {
   std::stringstream linestr;
   linestr.str(line);  // Assign the header line to the stringstream
 
-  unsigned n, m;  // Declare variables to store the number of nodes and edges
+  unsigned n;  // Declare variables to store the number of nodes and edges
   // Parse the line: ignore the first two words ("p" and "sp") and extract n (nodes) and m (edges)
-  linestr >> dummy >> dummy >> n >> m;
+  linestr >> dummy >> dummy >> n >> num_edges;
 
   // Resize the adjacency list to hold 'n' nodes
   resize(n);
@@ -32,7 +32,7 @@ void Graph::read_dimacs(std::istream& in) {
   unsigned i = 0;  // Initialize an edge counter
 
   // Read the remaining lines from the input stream (which contain edge definitions)
-  while (getline(in, line) && i < m) {
+  while (getline(in, line) && i < num_edges) {
     // Check if the line starts with "a ", indicating it's an edge definition line
     if (line.substr(0, 2) == "a ") {
       // Create a stringstream to parse the edge line

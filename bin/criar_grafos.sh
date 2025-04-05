@@ -5,10 +5,10 @@
 # Definir diretórios
 SRC_DIR="src"
 BIN_DIR="bin"
-BASE_OUTPUT_DIR="graphs"
+BASE_OUTPUT_DIR="graphs/part1"
 
 # Densidades a serem usadas
-densities=("0.1" "0.2" "0.4" "0.6" "0.8")
+densities=("0.1" "0.2" "0.3" "0.4" "0.5" "0.6")
 
 # Compilar o gerador de grafos
 g++ -o "$BIN_DIR/gen" "$SRC_DIR/gen.cpp" -std=c++17 -O2
@@ -28,7 +28,7 @@ for density in "${densities[@]}"; do
     echo "Gerando grafos com densidade $density..."
 
     # Gerar grafos para cada número de vértices
-    for ((i=8; i<=15; i++)); do
+    for ((i=6; i<=13; i++)); do
         n=$((2**i))
         output_file="$OUTPUT_DIR/graph_${n}.gr"
         echo "Gerando grafo com $n vértices e densidade $density..."

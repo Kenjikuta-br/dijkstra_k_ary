@@ -8,6 +8,8 @@ class Graph {
 public:
     std::vector<std::vector<std::pair<int, int>>> adj; // Lista de adjacência (pares com os vértices e pesos das arestas correspondentes)
 
+    long unsigned int num_edges = 0;  // Número de arestas lido do arquivo DIMACS
+
     // Construtor default que cria um grafo vazio
     Graph() {
         adj.resize(0);  // Inicializa um grafo vazio
@@ -31,6 +33,11 @@ public:
     // Retorna os vizinhos de um nó
     const std::vector<std::pair<int, int>>& getNeighbors(int node) const {
         return adj[node];
+    }
+
+    // Retorna o número de arestas lido do arquivo
+    unsigned getNumEdges() const {
+        return num_edges;
     }
 
     void read_dimacs(std::istream& in);

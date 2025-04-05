@@ -4,14 +4,14 @@
 #include <cstdlib>
 #include <chrono>
 #include <omp.h>
-//Armazena a referência do grafo.
-//Cria um vetor para armazenar as menores distâncias, inicialmente definidas como infinito.
+
+// Armazena a referência do grafo.
+// Cria um vetor para armazenar as menores distâncias, inicialmente definidas como infinito.
 Dijkstra::Dijkstra(const Graph& graph) : graph(graph) {
     distances.resize(graph.adj.size(), std::numeric_limits<int>::max());
 }
 
 void Dijkstra::computeShortestPaths(int source, int k, bool kenjiFlag) {
-
     // Garantindo que está utilizando apenas uma thread
     // omp_set_num_threads(1); 
 
@@ -60,17 +60,25 @@ void Dijkstra::computeShortestPaths(int source, int k, bool kenjiFlag) {
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time);
     
     if(kenjiFlag){
-        std::cout << heap.getInsertCount() << ";"
+        std::cout << graph.getNumEdges() << ";"
+          << heap.getInsertCount() << ";"
           << heap.getExtractMinCount() << ";"
           << heap.getDecreaseKeyCount() << ";"
-          << heap.calculateAverageR() << ";"
-          << duration.count()<< ";";
-    }else{
+          << heap.calculateAverageInsertR() << ";"
+          << heap.calculateAverageExtractMinR() << ";"
+          << heap.calculateAverageDecreaseKeyR() << ";"
+          << duration.count() << ";";
+    } else {
+        /*
+        std::cout << "Número de arestas: " << graph.getNumEdges() << std::endl;
         std::cout << "Número de inserts: " << heap.getInsertCount() << std::endl;
         std::cout << "Número de extractMin: " << heap.getExtractMinCount() << std::endl;
         std::cout << "Número de decreaseKey: " << heap.getDecreaseKeyCount() << std::endl;
-        std::cout << "Média de r: " << heap.calculateAverageR() << std::endl;
-        std::cout << "Tempo de execução: " << duration.count() << " ms" << std::endl;
+        std::cout << "Média de r para inserts: " << heap.calculateAverageInsertR() << std::endl;
+        std::cout << "Média de r para extractMin: " << heap.calculateAverageExtractMinR() << std::endl;
+        std::cout << "Média de r para decreaseKey: " << heap.calculateAverageDecreaseKeyR() << std::endl;
+        std::cout << "Tempo de execução: " << duration.count() << " µs" << std::endl;
+        */
     }
 }
 

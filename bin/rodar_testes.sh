@@ -1,11 +1,12 @@
 #!/bin/bash
+#chmod +x bin/rodar_testes.sh
 
 PROGRAM="./bin/tester"  # Novo programa tester
-GRAPH_DIR="graphs"
-RESULTS_DIR="resultados"
+GRAPH_DIR="graphs/part1"
+RESULTS_DIR="resultados/part1"
 mkdir -p "$RESULTS_DIR"
 
-K_VALUES=$(echo {2..10} 64 128 256 512) 
+K_VALUES=$(echo {2..64}) 
 NUM_RUNS=30  # Número de execuções por grafo/k
 
 for DENSITY_FOLDER in "$GRAPH_DIR"/density_*; do
@@ -13,7 +14,7 @@ for DENSITY_FOLDER in "$GRAPH_DIR"/density_*; do
     CSV_FILE="$RESULTS_DIR/resultados_density_${DENSITY}.csv"
     
     # Cabeçalho do CSV atualizado
-    echo "p;vertices;k;avg_insert;avg_extract;avg_decrease;avg_r;avg_time(microseconds);" > "$CSV_FILE"
+    echo "p;k;vertices;edges;avg_insert;avg_extract;avg_decrease;avg_insert_r;avg_extract_r;avg_decrease_r;avg_time(microseconds)" > "$CSV_FILE"
     
     # Processamento dos arquivos (mantido igual)
     GRAPH_FILES=()
@@ -39,7 +40,7 @@ for DENSITY_FOLDER in "$GRAPH_DIR"/density_*; do
             
             # Chama o novo programa tester que já faz as 30 execuções
             OUTPUT=$($PROGRAM "$K" "$NUM_RUNS" < "$GRAPH_FILE" )
-            echo "$DENSITY;$VERTICES;$K;$OUTPUT" >> "$CSV_FILE"
+            echo "$DENSITY;$K;$VERTICES;$OUTPUT" >> "$CSV_FILE"
         done
     done
 done
