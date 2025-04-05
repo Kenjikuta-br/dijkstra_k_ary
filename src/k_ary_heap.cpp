@@ -32,7 +32,7 @@ void KaryHeap::insert(const HeapNode& node) {
     insertCount++;
 
     // Calcula r para a operação de insert
-    double log_k_n = std::log(heap.size()) / std::log(k);
+    double log_k_n = std::ceil(std::log(heap.size()) / std::log(k));
     double r = (log_k_n == 0) ? 0 : static_cast<double>(siftUpCount) / log_k_n;
     insertRValues.push_back(r);
 
@@ -65,7 +65,8 @@ HeapNode KaryHeap::extractMin() {
     extractMinCount++;
 
     // Calcula r para a operação de extractMin
-    double log_k_n = std::log(heap.size() + 1) / std::log(k); // +1 because we just removed an element
+    // Usar teto do logaritmo para refletir a altura real
+    double log_k_n = std::ceil(std::log(heap.size() + 1) / std::log(k));
     double r = (log_k_n == 0) ? 0 : static_cast<double>(siftDownCount) / log_k_n;
     extractMinRValues.push_back(r);
 
@@ -96,7 +97,7 @@ void KaryHeap::decreaseKey(int node_id, int new_priority) {
     decreaseKeyCount++;
 
     // Calcula r para a operação de decreaseKey
-    double log_k_n = std::log(heap.size()) / std::log(k);
+    double log_k_n = std::ceil(std::log(heap.size()) / std::log(k));
     double r = (log_k_n == 0) ? 0 : static_cast<double>(siftUpCount) / log_k_n;
     decreaseKeyRValues.push_back(r);
 

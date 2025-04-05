@@ -71,22 +71,8 @@ plt.savefig(os.path.join(output_dir, "tempo_vs_k_por_densidade_linha.png"),
             bbox_inches='tight', dpi=300)
 plt.close()
 
-# 2. Barras agrupadas por p
-plt.figure(figsize=(10, 6))
-sns.barplot(data=df_64, x='k', y='avg_time(microseconds)', hue='p', 
-            edgecolor='black', alpha=0.85)
-plt.title('Tempo médio vs k (barras por densidade)', pad=20)
-plt.xlabel('Valor de k', labelpad=10)
-plt.ylabel('Tempo médio (μs)', labelpad=10)
-plt.xticks(x_ticks)
-plt.grid(True, linestyle='--', alpha=0.7)
-plt.legend(title='Densidade (p)')
-plt.tight_layout()
-plt.savefig(os.path.join(output_dir, "tempo_vs_k_por_densidade_barras.png"),
-            bbox_inches='tight', dpi=300)
-plt.close()
 
-# 3. Dispersão com regressão separada por p
+# 2. Dispersão com regressão separada por p
 plt.figure(figsize=(10, 6))
 sns.lmplot(data=df_64, x='k', y='avg_time(microseconds)', hue='p',
            markers='o', aspect=1.5, height=6, scatter_kws={'s': 80, 'alpha': 0.8})
@@ -100,7 +86,7 @@ plt.close()
 # Agrupar por k e tirar a média dos tempos
 df_k_avg = df_merged.groupby('k', as_index=False)['avg_time(microseconds)'].mean()
 
-# 4. Linha agregada: Tempo médio vs k (média geral de p e vértices)
+# 3. Linha agregada: Tempo médio vs k (média geral de p e vértices)
 plt.figure(figsize=(10, 6))
 sns.lineplot(data=df_k_avg, x='k', y='avg_time(microseconds)', marker='o', linewidth=2.5, color='steelblue')
 
@@ -116,5 +102,42 @@ plt.tight_layout()
 plt.savefig(os.path.join(output_dir, "tempo_vs_k_geral.png"),
             bbox_inches='tight', dpi=300)
 plt.close()
+
+# FILTRAGEM POR p = 0.1
+df_p01 = df_merged[df_merged['p'] == 0.1]
+
+# 4. Tempo médio por k (considerando todos os grafos com p = 0.1)
+df_k_avg_p01 = df_p01.groupby('k', as_index=False)['avg_time(microseconds)'].mean()
+
+plt.figure(figsize=(10, 6))
+sns.lineplot(data=df_k_avg_p01, x='k', y='avg_time(microseconds)', marker='o', linewidth=2.5, color='darkgreen')
+plt.title('Tempo médio vs k (p = 0.1, média de todos os grafos)', pad=20)
+plt.xlabel('Valor de k', labelpad=10)
+plt.ylabel('Tempo médio (μs)', labelpad=10)
+plt.xticks(x_ticks)
+plt.grid(True, linestyle='--', alpha=0.7)
+plt.tight_layout()
+plt.savefig(os.path.join(output_dir, "tempo_vs_k_p01_media.png"),
+            bbox_inches='tight', dpi=300)
+plt.close()
+
+# Valores distintos de número de vértices (esperados: 64 até 8192, potências de 2)
+vertex_sizes = sorted(df_p01['vertices'].unique())
+
+# 5. Um gráfico por número de vértices (p = 0.1)
+for v in vertex_sizes:
+    df_v = df_p01[df_p01['vertices'] == v]
+    
+    plt.figure(figsize=(10, 6))
+    sns.lineplot(data=df_v, x='k', y='avg_time(microseconds)', marker='o', linewidth=2.5, color='tab:blue')
+    plt.title(f'Tempo vs k (p = 0.1, vértices = {v})', pad=20)
+    plt.xlabel('Valor de k', labelpad=10)
+    plt.ylabel('Tempo médio (μs)', labelpad=10)
+    plt.xticks(x_ticks)
+    plt.grid(True, linestyle='--', alpha=0.7)
+    plt.tight_layout()
+    filename = f"tempo_vs_k_p01_vertices_{v}.png"
+    plt.savefig(os.path.join(output_dir, filename), bbox_inches='tight', dpi=300)
+    plt.close()
 
 print("\nGráficos por densidade salvos com sucesso!")

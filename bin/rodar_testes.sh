@@ -1,4 +1,5 @@
 #!/bin/bash
+#chmod +x bin/rodar_testes2.sh
 
 PROGRAM="./bin/tester"  # Novo programa tester
 GRAPH_DIR="graphs/part1"
