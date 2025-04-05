@@ -69,6 +69,7 @@ void Dijkstra::computeShortestPaths(int source, int k, bool kenjiFlag) {
           << heap.calculateAverageDecreaseKeyR() << ";"
           << duration.count() << ";";
     } else {
+        /*
         std::cout << "Número de arestas: " << graph.getNumEdges() << std::endl;
         std::cout << "Número de inserts: " << heap.getInsertCount() << std::endl;
         std::cout << "Número de extractMin: " << heap.getExtractMinCount() << std::endl;
@@ -77,6 +78,7 @@ void Dijkstra::computeShortestPaths(int source, int k, bool kenjiFlag) {
         std::cout << "Média de r para extractMin: " << heap.calculateAverageExtractMinR() << std::endl;
         std::cout << "Média de r para decreaseKey: " << heap.calculateAverageDecreaseKeyR() << std::endl;
         std::cout << "Tempo de execução: " << duration.count() << " µs" << std::endl;
+        */
     }
 }
 

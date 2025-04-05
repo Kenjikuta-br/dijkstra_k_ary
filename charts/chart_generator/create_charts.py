@@ -57,9 +57,19 @@ plt.rcParams['grid.alpha'] = 0.7
 # GRÁFICOS COMBINADOS
 
 # 1. Linha: tempo médio por k para cada p
+# Paleta de cores altamente contrastante
+cores_vibrantes = [
+    "#FF0000", "#0000FF", "#00FF00", "#FFA500", 
+    "#800080", "#00FFFF", "#FF00FF", "#808000",
+    "#008000", "#000080", "#8B0000", "#FFD700"
+]
+
 plt.figure(figsize=(10, 6))
+sns.set_palette(cores_vibrantes)  # Aplicando a paleta manualmente
+
 sns.lineplot(data=df_64, x='k', y='avg_time(microseconds)', hue='p',
              marker='o', linewidth=2.5)
+
 plt.title('Tempo médio vs k (por densidade p)', pad=20)
 plt.xlabel('Valor de k', labelpad=10)
 plt.ylabel('Tempo médio (μs)', labelpad=10)
