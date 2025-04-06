@@ -1,91 +1,102 @@
-import numpy as np
 import pandas as pd
-from sklearn.linear_model import LinearRegression
+import numpy as np
+import statsmodels.api as sm
 import matplotlib.pyplot as plt
+from sklearn.preprocessing import StandardScaler
 
-# Configure matplotlib for non-interactive environments
-plt.switch_backend('Agg')  # Prevents the FigureCanvasAgg warning
-
-# Load data and filter k=17
+# Carregar os dados
 dados = pd.read_csv('resultados/part2/normalized_results_k17.csv', delimiter=';')
-dados = dados[dados['k'] == 17]
 
-# Remove rows with zero or negative values that would cause log problems
-dados = dados[(dados['vertices'] > 0) & 
-              (dados['edges'] > 0) & 
-              (dados['avg_time(microseconds)'] > 0)]
+# Renomear colunas para facilitar o uso
+dados = dados.rename(columns={
+    'vertices': 'n',
+    'edges': 'm',
+    'avg_insert': 'I',
+    'avg_extract': 'D',
+    'avg_decrease': 'U',
+    'avg_time(microseconds)': 'T'
+})
 
-# Create log columns safely
-dados["log_n"] = np.log(dados["vertices"])
-dados["log_m"] = np.log(dados["edges"])
-dados["log_T"] = np.log(dados["avg_time(microseconds)"])
+# 1. Filtrar linhas com valores inválidos (zeros ou negativos)
+dados = dados[(dados['n'] > 0) & 
+             (dados['m'] > 0) & 
+             (dados['T'] > 0) &
+             (dados['I'] > 0) &
+             (dados['D'] > 0)].copy()
 
-# Remove infinite values that may have been created
-dados.replace([np.inf, -np.inf], np.nan, inplace=True)
-dados.dropna(inplace=True)
+# 2. Filtrar dados para análise específica
+# Dados onde m é aproximadamente fixo (~1M arestas)
+dados_m_fixo = dados[(dados['m'] > 1e6) & (dados['m'] < 1.1e6)].copy()
 
-def analyze_complexity(df, name):
-    """Analyze time complexity for a dataset"""
-    if len(df) < 2:  # Need at least 2 points for regression
-        print(f"\nNot enough data points for {name}")
-        return None
-    
-    try:
-        X = df[["log_n", "log_m"]]
-        y = df["log_T"]
-        
-        # Verify there are no infinite values
-        if np.any(np.isinf(X.values)) or np.any(np.isinf(y.values)):
-            print(f"\nInfinite values found in {name}, skipping")
-            return None
-            
-        modelo = LinearRegression()
-        modelo.fit(X, y)
-        
-        A = modelo.intercept_
-        b, c = modelo.coef_
-        
-        print(f"\nAnálise para {name}:")
-        print(f"log(a) = {A:.4f}, então a ≈ {np.exp(A):.4f}")
-        print(f"Coeficiente para n (b) = {b:.4f}")
-        print(f"Coeficiente para m (c) = {c:.4f}")
-        print(f"Equação estimada: log(T) = {A:.4f} + {b:.4f}*log(n) + {c:.4f}*log(m)")
-        print(f"Ou: T ≈ {np.exp(A):.4f} * n^{b:.4f} * m^{c:.4f}")
-        
-        # Plot results
-        plt.figure(figsize=(10, 6))
-        plt.scatter(df["vertices"], df["avg_time(microseconds)"], label='Dados observados')
-        
-        # Add prediction line
-        df = df.copy()  # Avoid SettingWithCopyWarning
-        df.loc[:, 'predicted'] = np.exp(modelo.predict(X))
-        plt.plot(df["vertices"], df['predicted'], 'r-', label='Modelo ajustado')
-        
-        plt.xscale('log')
-        plt.yscale('log')
-        plt.xlabel('Número de vértices (n)')
-        plt.ylabel('Tempo de execução (μs)')
-        plt.title(f'Complexidade do Algoritmo ({name})')
-        plt.legend()
-        plt.grid(True)
-        plt.savefig(f'complexity_analysis_{name}.png')
-        plt.close()
-        
-        return modelo
-    
-    except Exception as e:
-        print(f"\nError analyzing {name}: {str(e)}")
-        return None
+# Dados onde n é fixo (n=32768)
+dados_n_fixo = dados[dados['n'] == 32768].copy()
 
-# Separate data
-fixed_vertices = dados[dados['edges'] > 1e6]  # Graphs with fixed vertices
-fixed_edges = dados[dados['edges'].between(0.9e6, 1.1e6)]  # Graphs with ~1M edges
+# 3. Preparação para regressão linear
+# Aplicar logaritmo nas variáveis (já filtramos zeros)
+for df in [dados, dados_m_fixo, dados_n_fixo]:
+    df['log_T'] = np.log(df['T'])
+    df['log_n'] = np.log(df['n'])
+    df['log_m'] = np.log(df['m'])
 
-# Run analyses
-print("="*60)
-modelo_vertices = analyze_complexity(fixed_vertices, "Vértices Fixos")
-print("="*60)
-modelo_arestas = analyze_complexity(fixed_edges, "Arestas Fixas")
-print("="*60)
-modelo_geral = analyze_complexity(dados, "Todos os dados")
-print("="*60)
+# 4. Regressão linear múltipla para todos os dados
+X = dados[['log_n', 'log_m']]
+X = sm.add_constant(X)  # Adiciona intercepto
+y = dados['log_T']
+
+model = sm.OLS(y, X)
+results = model.fit()
+print(results.summary())
+
+# Extrair coeficientes
+a = np.exp(results.params['const'])  # intercept
+b = results.params['log_n']         # coeficiente para log_n
+c = results.params['log_m']         # coeficiente para log_m
+
+print(f"\nEquação estimada: T(n,m) = {a:.4f} * n^{b:.4f} * m^{c:.4f}")
+
+# 5. Análise gráfica
+plt.figure(figsize=(15, 5))
+
+# Gráfico 1: Tempo normalizado vs número de vértices (m fixo)
+plt.subplot(1, 3, 1)
+plt.scatter(dados_m_fixo['n'], dados_m_fixo['normalized_time'])
+plt.xscale('log')
+plt.xlabel('Número de vértices (n)')
+plt.ylabel('Tempo normalizado')
+plt.title('Tempo normalizado vs n (m ≈ 1M)')
+plt.grid(True)
+
+# Gráfico 2: Tempo normalizado vs número de arestas (n fixo)
+plt.subplot(1, 3, 2)
+plt.scatter(dados_n_fixo['m'], dados_n_fixo['normalized_time'])
+plt.xscale('log')
+plt.xlabel('Número de arestas (m)')
+plt.ylabel('Tempo normalizado')
+plt.title('Tempo normalizado vs m (n=32768)')
+plt.grid(True)
+
+# Gráfico 3: Valores reais vs preditos
+plt.subplot(1, 3, 3)
+predicted = np.exp(results.predict(X))
+plt.scatter(dados['T'], predicted)
+plt.plot([min(dados['T']), max(dados['T'])], [min(dados['T']), max(dados['T'])], 'r--')
+plt.xlabel('Tempo real (μs)')
+plt.ylabel('Tempo predito (μs)')
+plt.title('Valores reais vs preditos')
+plt.grid(True)
+
+plt.tight_layout()
+plt.savefig('analise_dijkstra.png')  # Salvar figura antes de mostrar
+plt.show()
+
+# 6. Verificação dos limites das operações
+print("\nVerificação dos limites:")
+print(f"Max I/n: {max(dados['I']/dados['n'])} (deve ser <= 1)")
+print(f"Max D/n: {max(dados['D']/dados['n'])} (deve ser <= 1)")
+print(f"Max U/m: {max(dados['U']/dados['m'])} (deve ser <= 1)")
+
+# 7. Análise das razões das operações
+print("\nAnálise das razões médias:")
+print(f"Insert ratio médio: {dados['avg_insert_r'].mean():.4f}")
+print(f"Extract ratio médio: {dados['avg_extract_r'].mean():.4f}")
+print(f"Decrease ratio médio: {dados['avg_decrease_r'].mean():.4f}")
