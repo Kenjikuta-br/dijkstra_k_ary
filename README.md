@@ -32,6 +32,7 @@ Esta é uma implementação do algoritmo de Dijkstra utilizando um heap k-ário,
 
 A organização das pastas é a seguinte:
 
+```
 dijkstra_k_ary/
 ├── .vscode/            
 │   ├── c_cpp_properties.json  → Configurações do IntelliSense, include paths e compilação para C/C++ no VS Code.
@@ -59,7 +60,7 @@ dijkstra_k_ary/
 │   ├── dijkstra.o             → Objeto compilado do código Dijkstra.
 │   ├── graph.o                → Objeto dos grafos.
 │   ├── k_ary_heap.o           → Objeto do heap k-ário.
-│   └── main.o                 → Objeto do main.cpp.
+│   └── main.o
 ├── resultados/         
 │   ├── part1                  → Resultados dos testes.
 │   └── part2                  → Mais resultados.
@@ -78,7 +79,7 @@ dijkstra_k_ary/
 ├── .gitignore                 → Arquivos ignorados.
 ├── Makefile                   → Build script.
 └── aggregated_k17_metrics.csv → Métricas agregadas.
-
+```
 
 # Ambiente Virtual com Python
 
